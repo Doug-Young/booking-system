@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: devuser
+      MONGO_INITDB_ROOT_PASSWORD: devpass
+
+  room-service:
+    build: ./room-service
+    container_name: room-service
+    ports:
+      - "3001:3001"
+
+  booking-service:
+    build: ./booking-service
+    container_name: booking-service
+    ports:
+      - "3002:3002"
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://devuser:devpass@mongo:27017/bookingdb?authSource=admin
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "3003:3003"
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URI: mongodb://devuser:devpass@mongo:27017/authdb?authSource=admin
+
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - room-service
+      - booking-service
+      - auth-service
