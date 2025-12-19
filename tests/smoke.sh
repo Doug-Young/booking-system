@@ -3,13 +3,28 @@ set -euo pipefail
 
 BASE_URL="${BASE_URL:-http://localhost}"
 
-echo "Testing: $BASE_URL/health"
-curl -fsS "$BASE_URL/health" > /dev/null
+check() {
+  local path="$1"
+  local tries=20
 
-echo "Testing: $BASE_URL/rooms"
-curl -fsS "$BASE_URL/rooms" > /dev/null
+  echo "Testing: $BASE_URL$path"
+  for i in $(seq 1 $tries); do
+    if curl -fsS "$BASE_URL$path" > /dev/null; then
+      echo "OK: $path"
+      return 0
+    fi
+    echo "Retry $i/$tries..."
+    sleep 2
+  done
 
-echo "Testing: $BASE_URL/bookings"
-curl -fsS "$BASE_URL/bookings" > /dev/null
+  # Print the HTTP status code to help debug in Actions logs
+  code=$(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL$path" || true)
+  echo "FAILED: $path (HTTP $code)"
+  return 1
+}
+
+check "/health"
+check "/rooms"
+check "/bookings"
 
 echo "Smoke tests passed."
