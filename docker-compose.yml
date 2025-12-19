@@ -37,12 +37,11 @@ services:
     environment:
       MONGO_URI: mongodb://devuser:devpass@mongo:27017/authdb?authSource=admin
 
-
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway
     ports:
-    - "80:3000"
+      - "80:3000"
     depends_on:
       - room-service
       - booking-service
