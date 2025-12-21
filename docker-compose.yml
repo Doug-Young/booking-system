@@ -24,8 +24,6 @@ services:
       - "3002:3002"
     depends_on:
       - mongo
-    environment:
-      MONGO_URI: mongodb://devuser:devpass@mongo:27017/bookingdb?authSource=admin
 
   auth-service:
     build: ./auth-service
@@ -34,8 +32,12 @@ services:
       - "3003:3003"
     depends_on:
       - mongo
-    environment:
-      MONGO_URI: mongodb://devuser:devpass@mongo:27017/authdb?authSource=admin
+
+  weather-service:
+    build: ./weather-service
+    container_name: weather-service
+    ports:
+      - "3004:3004"
 
   api-gateway:
     build: ./api-gateway
@@ -46,3 +48,4 @@ services:
       - room-service
       - booking-service
       - auth-service
+      - weather-service

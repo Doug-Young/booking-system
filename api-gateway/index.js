@@ -10,6 +10,8 @@ const PORT = process.env.PORT || 3000;
 const ROOM_SERVICE_URL = "http://room-service:3001";
 const BOOKING_SERVICE_URL = "http://booking-service:3002";
 const AUTH_SERVICE_URL = "http://auth-service:3003";
+const WEATHER_SERVICE_URL = "http://weather-service:3004";
+
 
 // Health
 app.get("/health", (req, res) => {
@@ -76,6 +78,16 @@ app.get("/auth/user/:id", async (req, res) => {
   } catch (e) {
     console.log("auth-service user lookup failed");
     res.status(404).end();
+  }
+});
+
+app.get("/weather", async (req, res) => {
+  try {
+    const r = await axios.get(`${WEATHER_SERVICE_URL}/weather`, { params: req.query });
+    res.json(r.data);
+  } catch (e) {
+    console.log("weather-service failed");
+    res.status(502).end();
   }
 });
 
